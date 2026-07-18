@@ -1,87 +1,69 @@
-// ==========================================
-// 1. IMPORTS
-// ==========================================
+//  IMPORTS
 require('dotenv').config();
-
+const fs = require('fs').promises;
 const express = require('express');
 const path = require('path');
 const app = express();
 
-// ==========================================
-// 2. MIDDLEWARES GLOBALES
-// ==========================================
+
+//  MIDDLEWARES GLOBALES
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 
-// ==========================================
+
 //  RUTAS
-// ==========================================
-app.route('/')
-    .get((req, res) => {
-        res.render("home", {
-            titulo: name_brand,
-            products: products,
-            msg_welcome: welcomeMsg
-        });
-    })
-    .all((req, res) => {
-        res.status(405).send("Método no permitido");
-    });
+app.get('/catalogo', async (req, res) => {
+    // primero obtenemos la query con el parámetro "tipo"
+    const { tipo } = req.query;
 
-app.route('/about')
-    .get((req, res) => {
-        res.render("about", {
-        });
-    })
-    .all((req, res) => {
-        res.status(405).send("Método no permitido");
-    });
+    // si el parametro "tipo" no está , entonces lanza error
+    if (!tipo) {
+        return res.status(400).json({ error: 'Falta el parámetro "tipo" en la query string' });
+    }
 
-app.route('/contact')
-    .get((req, res) => {
-        res.render("contact", {
-            titulo: "Contáctanos"
-        });
-    })
-    .post((req, res) => {
-        const { nombre, email, mensaje } = req.body;
+    //    como hay solo dos tipos de parametros , pelicula y serie y si no es ninguna , lanza error
+    if (tipo !== 'peliculas' && tipo !== 'series') {
+        return res.status(400).json({ error: 'El parámetro "tipo" debe ser "peliculas" o "series"' });
+    }
 
-        console.log("Nuevo mensaje de contacto:", { nombre, email, mensaje });
+    try {
 
-        res.render("success", {
-            nombre: nombre
-        });
-    })
-    .all((req, res) => {
-        res.status(405).send("Método no permitido");
-    });
+        const contenido = await fs.readFile(rutaArchivo, 'utf-8');
+        console.log(contenido)
+
+    } catch (err) {
+
+        console.error('Error leyendo archivo:', err);
+        return res.status(500).json({ error: 'Error interno al leer el catálogo' });
+    }
+});
+
 
 // ==========================================
-// 6. MANEJO DE ERRORES (siempre al final)
+//  MANEJO DE ERRORES (siempre al final)
 // ==========================================
 
-// 404 - Ruta que no existe
+//el usuario puso una ruta que no está declarada arriba
 app.use((req, res) => {
-    res.status(404).render("404", {
-        titulo: "Página no encontrada"
+    res.status(404).json({
+        error: 'Ruta no encontrada'
     });
 });
 
-// 500 - Error inesperado del servidor
+// evita que el servidor entero se caiga , por cualquiera sea el error que no hayamos declarado
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).render("error", {
-        titulo: "Error del servidor",
-        mensaje: "Algo salió mal. Intenta de nuevo más tarde."
+    res.status(500).json({
+        error: 'Error interno del servidor'
     });
 });
 
-// ==========================================
-// 7. ARRANQUE DEL SERVIDOR
-// ==========================================
+
+//ARRANQUE DEL SERVIDOR
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
