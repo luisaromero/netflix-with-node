@@ -1,5 +1,5 @@
 //  IMPORTS
-const { parseContent, normalizerType } = require('./utils/helpers');
+const { parseContent, normalizerType } = require('./utils/helpers/helpers.js');
 require('dotenv').config();
 const fs = require('fs').promises;
 const express = require('express');
@@ -24,14 +24,14 @@ const SERIES_ROUTE = path.join(__dirname, 'data', 'series.txt');
 app.get('/catalogo', async (req, res) => {
     // primero obtenemos la query con el parámetro "tipo"
     // si el parametro "tipo" no está , entonces lanza error
-    const tipo = normalizarTipo(tipo);
+    const tipo = normalizerType(req.query.tipo);
     if (!tipo) {
         return res.status(400).json({ error: 'El parámetro "tipo" debe ser pelicula(s) o serie(s)' });
     }
 
     //    como hay solo dos tipos de parametros , pelicula y serie y si no es ninguna , lanza error
     if (tipo !== 'peliculas' && tipo !== 'series') {
-        return res.status(400).json({ error: 'El parámetro "tipo" debe ser "peliculas" o "series"' });
+        return res.status(400).json({ error: 'El parámetro "tipo" debe ser "pelicula(s) o serie(s)"' });
     }
     // 3) Elegir el archivo correcto según el tipo ya validado
     const pathToFile = tipo === 'peliculas' ? MOVIE_ROUTE : SERIES_ROUTE;
@@ -41,6 +41,7 @@ app.get('/catalogo', async (req, res) => {
         const fileContents = await fs.readFile(pathToFile, 'utf-8');
         const items = parseContent(fileContents, tipo);
         console.log(items)
+        return res.status(200).json(items);
 
     } catch (err) {
 

@@ -23,10 +23,10 @@ function parseContent(txtFormat, type) {
 
         if (type === 'peliculas') {
             const [nameMovie, director, year] = fields;
-            items.push({ nombre, director, anio: Number(anio) });
+            items.push({ nombre: nameMovie, director: director, anio: Number(year) });
         } else {
             const [nameSerie, yearOfRelease, seasons] = fields;
-            items.push({ nombre, anioEstreno: Number(yearOfRelease), temporadas: Number(seasons) });
+            items.push({ nombre: nameSerie, anioEstreno: Number(yearOfRelease), temporadas: Number(seasons) });
         }
     }
 
