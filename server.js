@@ -34,11 +34,11 @@ app.get('/catalogo', async (req, res) => {
         return res.status(400).json({ error: 'El parámetro "tipo" debe ser "peliculas" o "series"' });
     }
     // 3) Elegir el archivo correcto según el tipo ya validado
-    const rutaArchivo = tipo === 'peliculas' ? MOVIE_ROUTE : SERIES_ROUTE;
+    const pathToFile = tipo === 'peliculas' ? MOVIE_ROUTE : SERIES_ROUTE;
 
     try {
 
-        const fileContents = await fs.readFile(rutaArchivo, 'utf-8');
+        const fileContents = await fs.readFile(pathToFile, 'utf-8');
         const items = parseContent(fileContents, tipo);
         console.log(items)
 
