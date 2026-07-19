@@ -1,5 +1,5 @@
 //  IMPORTS
-const { parseContent, normalizerType } = require('./utils/helpers/helpers.js');
+const { parseContent, normalizerType, isDuplicate } = require('./utils/helpers/helpers.js');
 require('dotenv').config();
 const fs = require('fs').promises;
 const express = require('express');
