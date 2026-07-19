@@ -33,7 +33,25 @@ function parseContent(txtFormat, type) {
     return items;
 }
 
+// funcion que vela que haya un POST de una peli o serie ya que esta en el archivo
+// aplicamos criterio : pueden haber pelis/serie con el mismo nombre pero de diferentes años ...
+function isDuplicate(items, type, newItem) {
+    return items.some(item => {
+        //usamos toLoWerCase , para que no sea case sensitive 
+        //comparamos si hay dentro del archivo el mismo nombre del que queremos agregar
+        const sameName = item.nombre.trim().toLowerCase() === newItem.nombre.trim().toLowerCase();
+        // lo mismo pero con el nombre
+        // con el ternario ":" pasamos serie(s) ya que el año se llama diff
+        const sameYear = type === 'peliculas'
+            ? item.anio === newItem.anio
+            : item.anioEstreno === newItem.anioEstreno;
+        // retorna true si mismos nombres y mismos años son iguales en, otro caso es false
+        return sameName && sameYear;
+    });
+}
+
 module.exports = {
     normalizerType,
-    parseContent
+    parseContent,
+    isDuplicate
 };

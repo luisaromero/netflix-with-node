@@ -49,6 +49,9 @@ app.get('/catalogo', async (req, res) => {
         return res.status(500).json({ error: 'Error interno al leer el catálogo' });
     }
 });
+app.post('/catalogo', async (req, res) => {
+    // aqui traremos la query , normalizaremos y luego lo demas
+})
 
 
 // ==========================================
