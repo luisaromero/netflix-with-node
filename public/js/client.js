@@ -1,5 +1,7 @@
 
 const formMovie = document.getElementById('formMovie');
+const formSeries = document.getElementById('formSeries');
+
 
 formMovie.addEventListener('submit', async (event) => {
     event.preventDefault(); // evita que el form recargue la página
@@ -34,4 +36,37 @@ formMovie.addEventListener('submit', async (event) => {
 
     }
 });
+
+formSeries.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const newSeries = {
+        tipo: 'serie',
+        nombre: document.getElementById('seriesName').value,
+        anioEstreno: document.getElementById('yearOfRelease').value,
+        temporadas: document.getElementById('seasons').value,
+    };
+
+    try {
+        const postNewSeries = await fetch('http://localhost:3000/catalogo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newSeries)
+        });
+
+        const data = await postNewSeries.json();
+
+        if (!postNewSeries.ok) {
+
+            console.log(data.error, 'error 1')
+            return;
+        }
+        console.log(`"${data.nombre}" agregada con éxito`)
+
+        formSeries.reset();
+
+    } catch (err) {
+        console.log('error 2', err)
+
+    }
+})
 
