@@ -1,5 +1,10 @@
 //  IMPORTS
-const { parseContent, normalizerType, isDuplicate } = require('./utils/helpers/helpers.js');
+const { parseContent,
+    normalizerType,
+    isDuplicate,
+    isValidNumber,
+    newLineToPost } = require('./utils/helpers/helpers.js');
+
 require('dotenv').config();
 const fs = require('fs').promises;
 const express = require('express');
@@ -11,12 +16,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/static', express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Rutas absolutas a los archivos de datos
 const MOVIE_ROUTE = path.join(__dirname, 'data', 'peliculas.txt');
 const SERIES_ROUTE = path.join(__dirname, 'data', 'series.txt');
+
+function getFilePathByType(type) {
+    return type === 'peliculas' ? MOVIE_ROUTE : SERIES_ROUTE;
+}
+
 
 
 
@@ -25,20 +34,17 @@ app.get('/catalogo', async (req, res) => {
     // primero obtenemos la query con el parámetro "tipo"
     // si el parametro "tipo" no está , entonces lanza error
     const tipo = normalizerType(req.query.tipo);
+    //    como hay solo dos tipos de parametros , pelicula y serie y si no es ninguna , lanza error
+
     if (!tipo) {
         return res.status(400).json({ error: 'El parámetro "tipo" debe ser pelicula(s) o serie(s)' });
     }
 
-    //    como hay solo dos tipos de parametros , pelicula y serie y si no es ninguna , lanza error
-    if (tipo !== 'peliculas' && tipo !== 'series') {
-        return res.status(400).json({ error: 'El parámetro "tipo" debe ser "pelicula(s) o serie(s)"' });
-    }
     // 3) Elegir el archivo correcto según el tipo ya validado
-    const pathToFile = tipo === 'peliculas' ? MOVIE_ROUTE : SERIES_ROUTE;
 
     try {
 
-        const fileContents = await fs.readFile(pathToFile, 'utf-8');
+        const fileContents = await fs.readFile(getFilePathByType(tipo), 'utf-8');
         const items = parseContent(fileContents, tipo);
         console.log(items)
         return res.status(200).json(items);
@@ -49,9 +55,96 @@ app.get('/catalogo', async (req, res) => {
         return res.status(500).json({ error: 'Error interno al leer el catálogo' });
     }
 });
+
 app.post('/catalogo', async (req, res) => {
-    // aqui traremos la query , normalizaremos y luego lo demas
-})
+    const tipo = normalizerType(req.body.tipo);
+
+    if (!tipo) {
+        return res.status(400).json({
+            error: 'El campo "tipo" debe ser pelicula(s) o serie(s)'
+        });
+    }
+
+    const { nombre, director, anio, anioEstreno, temporadas } = req.body;
+
+    if (!nombre || !nombre.trim()) {
+        return res.status(400).json({
+            error: 'El campo "nombre" es obligatorio'
+        });
+    }
+
+    let newItem;
+
+    if (tipo === 'peliculas') {
+
+        if (!director || !director.trim()) {
+            return res.status(400).json({
+                error: 'El campo "director" es obligatorio'
+            });
+        }
+
+        if (!isValidNumber(anio)) {
+            return res.status(400).json({
+                error: 'El campo "anio" debe ser un entero válido'
+            });
+        }
+
+        newItem = {
+            nombre: nombre.trim(),
+            director: director.trim(),
+            anio: Number(anio)
+        };
+
+    } else {
+
+        if (!isValidNumber(anioEstreno)) {
+            return res.status(400).json({
+                error: 'El campo "anioEstreno" debe ser un entero válido'
+            });
+        }
+
+        if (!isValidNumber(temporadas)) {
+            return res.status(400).json({
+                error: 'El campo "temporadas" debe ser un entero válido'
+            });
+        }
+
+        newItem = {
+            nombre: nombre.trim(),
+            anioEstreno: Number(anioEstreno),
+            temporadas: Number(temporadas)
+        };
+    }
+
+    try {
+        const filePath = getFilePathByType(tipo);
+
+        const content = await fs.readFile(filePath, 'utf-8');
+        const items = parseContent(content, tipo);
+
+        if (isDuplicate(items, tipo, newItem)) {
+            return res.status(409).json({
+                error: `Ya existe un registro "${newItem.nombre}" (${tipo === 'peliculas'
+                    ? newItem.anio
+                    : newItem.anioEstreno
+                    })`
+            });
+        }
+
+        const lineToSave = newLineToPost(tipo, newItem) + '\n';
+
+        await fs.appendFile(filePath, lineToSave);
+
+        return res.status(201).json(newItem);
+
+    } catch (err) {
+        console.error('Error escribiendo archivo:', err);
+
+        return res.status(500).json({
+            error: 'Error interno al guardar el nuevo registro'
+        });
+    }
+});
 
 
 // ==========================================

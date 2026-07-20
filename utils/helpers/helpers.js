@@ -49,11 +49,34 @@ function isDuplicate(items, type, newItem) {
         return sameName && sameYear;
     });
 }
+// verifica si el valor ingresado no sea undefined , no sea nulo o esté en blanco y 
+// si pasa esos filtros retorna true si el valor es un numero entero y que ademas sea mayor a uno
+// porque una temporadas debe ser 1 o mas
+function isValidNumber(value) {
+    if (
+        value === undefined ||
+        value === null ||
+        String(value).trim() === ''
+    ) {
+        return false;
+    }
 
+    const number = Number(value);
+
+    return Number.isInteger(number) && number >= 1;
+}
+// se crea un nuevo objeto para el metodo POST
+function newLineToPost(type, obj) {
+    return type === 'peliculas'
+        ? `${obj.nombre}, ${obj.director}, ${obj.anio}`
+        : `${obj.nombre}, ${obj.anioEstreno}, ${obj.temporadas}`;
+}
 
 
 module.exports = {
     normalizerType,
     parseContent,
-    isDuplicate
+    isDuplicate,
+    isValidNumber,
+    newLineToPost
 };
