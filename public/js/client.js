@@ -23,17 +23,23 @@ formMovie.addEventListener('submit', async (event) => {
         const data = await postNewMovie.json();
 
         if (!postNewMovie.ok) {
-
-            console.log(data.error, 'error 1')
+            showMessage('msgMovie', data.error, true);
             return;
         }
-        console.log(`"${data.nombre}" agregada con éxito`)
+
+        showMessage(
+            'msgMovie',
+            `"${data.nombre}" agregada con éxito`
+        );
 
         formMovie.reset();
 
     } catch (err) {
-        console.log('error 2', err)
-
+        showMessage(
+            'msgMovie',
+            'No se pudo conectar con el servidor',
+            true
+        );
     }
 });
 
@@ -56,17 +62,34 @@ formSeries.addEventListener('submit', async (event) => {
         const data = await postNewSeries.json();
 
         if (!postNewSeries.ok) {
-
-            console.log(data.error, 'error 1')
+            showMessage('msgSeries', data.error, true);
             return;
         }
-        console.log(`"${data.nombre}" agregada con éxito`)
+
+        showMessage(
+            'msgSeries',
+            `"${data.nombre}" agregada con éxito`
+        );
 
         formSeries.reset();
 
     } catch (err) {
-        console.log('error 2', err)
-
+        showMessage(
+            'msgSeries',
+            'No se pudo conectar con el servidor',
+            true
+        );
     }
 })
 
+function showMessage(elementId, message, isError = false) {
+    const element = document.getElementById(elementId);
+
+    element.textContent = message;
+
+    element.classList.remove('msg-success', 'msg-error');
+
+    element.classList.add(
+        isError ? 'msg-error' : 'msg-success'
+    );
+}

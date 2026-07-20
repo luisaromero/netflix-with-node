@@ -3,7 +3,8 @@ const { parseContent,
     normalizerType,
     isDuplicate,
     isValidNumber,
-    newLineToPost } = require('./utils/helpers/helpers.js');
+    newLineToPost,
+    deleteByName } = require('./utils/helpers/helpers.js');
 
 require('dotenv').config();
 const fs = require('fs').promises;
@@ -145,6 +146,45 @@ app.post('/catalogo', async (req, res) => {
         });
     }
 });
+
+//  /catalogo /: nombre ? tipo = pelicula(s) | serie(s)
+
+app.delete('/catalogo/:nombre', async (req, res) => {
+    const tipo = normalizerType(req.query.tipo);
+    if (!tipo) {
+        return res.status(400).json({ error: 'El parámetro "tipo" debe ser pelicula(s) o serie(s)' });
+    }
+
+    const nameToDelete = decodeURIComponent(req.params.nombre).trim();
+    if (!nameToDelete) {
+        return res.status(400).json({ error: 'El nombre no puede estar vacío' });
+    }
+    // en try colocamos la logica que ya no depende del usuario
+    try {
+        const filePath = getFilePathByType(tipo);
+        const content = await fs.readFile(filePath, 'utf-8');
+        const items = parseContent(content, tipo);
+
+        const updatedCatalog = deleteByName(items, nameToDelete);
+
+        // si el el file actual de peli o series es el mismo que retorna updatedCatalog 
+        // que se supone deberia ser el nuevo array entonces el nombre no se encontró dentro del file
+
+        if (updatedCatalog.length === items.length) {
+            return res.status(404).json({ error: `No se encontró "${nameToDelete}" en el catálogo` });
+        }
+
+        const newContent = updatedCatalog.map(item => newLineToPost(tipo, item)).join('\n');
+        await fs.writeFile(filePath, updatedCatalog.length ? newContent + '\n' : '');
+
+        return res.status(200).json({ mensaje: 'Eliminado con éxito', nombre: nameToDelete });
+
+    } catch (err) {
+        console.error('Error eliminando registro:', err);
+        return res.status(500).json({ error: 'Error interno al eliminar el registro' });
+    }
+});
+
 
 
 // ==========================================

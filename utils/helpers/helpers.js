@@ -65,11 +65,17 @@ function isValidNumber(value) {
 
     return Number.isInteger(number) && number >= 1;
 }
-// se crea un nuevo objeto para el metodo POST
+// se crea un nuevo objeto para el metodo POST y DELETE
 function newLineToPost(type, obj) {
     return type === 'peliculas'
         ? `${obj.nombre}, ${obj.director}, ${obj.anio}`
         : `${obj.nombre}, ${obj.anioEstreno}, ${obj.temporadas}`;
+}
+//aqui la función dice , si no elemento no coincide con el nombre que quiere elimar el usuario ,
+//  entonces quedate en el array que se está formando
+function deleteByName(items, name) {
+    const nameToDelete = name.trim().toLowerCase();
+    return items.filter(item => item.nombre.trim().toLowerCase() !== nameToDelete);
 }
 
 
@@ -78,5 +84,6 @@ module.exports = {
     parseContent,
     isDuplicate,
     isValidNumber,
-    newLineToPost
+    newLineToPost,
+    deleteByName
 };

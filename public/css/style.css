@@ -1,0 +1,13 @@
+.msg {
+  min-height: 24px;
+  margin-top: 0.75rem;
+  font-weight: bold;
+}
+
+.msg-success {
+  color: green;
+}
+
+.msg-error {
+  color: red;
+}
