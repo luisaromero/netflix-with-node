@@ -2,6 +2,8 @@
 const formMovie = document.getElementById('formMovie');
 const formSeries = document.getElementById('formSeries');
 
+// aqui tendremos la lógica del dom para los formularios
+
 
 formMovie.addEventListener('submit', async (event) => {
     event.preventDefault(); // evita que el form recargue la página

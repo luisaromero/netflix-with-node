@@ -4,55 +4,69 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mi Netflix</title>
+    <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
-    <section>
-      <h2>Explorar catálogo</h2>
+    <header class="hero">
+      <h1>Mi personal <span>Netflix</span></h1>
+      <p>"La vida es mejor con una buena película."</p>
+    </header>
 
-      <div class="botones-catalogo">
-        <button id="btnPeliculas">LISTA DE PELÍCULAS</button>
-        <button id="btnSeries">LISTA DE SERIES</button>
-      </div>
+    <div class="forms-container">
+      <section class="form-card">
+        <h2>Agregar nueva película</h2>
+        <form id="formMovie">
+          <div class="formFields">
+            <label for="movieTitle">Nombre</label>
+            <input type="text" id="movieTitle" required />
+          </div>
+          <div class="formFields">
+            <label for="directorOfTheFilm">Director</label>
+            <input type="text" id="directorOfTheFilm" required />
+          </div>
+          <div class="formFields">
+            <label for="yearOfTheFilm">Año</label>
+            <input type="number" id="yearOfTheFilm" required />
+          </div>
+          <button type="submit">AGREGAR NUEVA PELÍCULA</button>
+        </form>
+        <p id="msgMovie" class="msg"></p>
+      </section>
+
+      <section class="form-card">
+        <h2>Agregar nueva serie</h2>
+        <form id="formSeries">
+          <div class="formFields">
+            <label for="seriesName">Nombre</label>
+            <input type="text" id="seriesName" required />
+          </div>
+          <div class="formFields">
+            <label for="yearOfRelease">Año estreno</label>
+            <input type="number" id="yearOfRelease" required />
+          </div>
+          <div class="formFields">
+            <label for="seasons">N° temporadas</label>
+            <input type="number" id="seasons" required />
+          </div>
+          <button type="submit">AGREGAR NUEVA SERIE</button>
+        </form>
+        <p id="msgSeries" class="msg"></p>
+      </section>
+    </div>
+
+    <section class="actions">
+      <h2>Explorar catálogo</h2>
+      <button id="btnMovies">Lista de películas</button>
+      <button id="btnSeries">Lista de series</button>
+
+      <select id="sortSelect">
+        <option value="">Ordenar por...</option>
+      </select>
     </section>
-    <section>
-      <h2>Agregar nueva película</h2>
-      <form id="formMovie">
-        <div class="formFields">
-          <label for="movieTitle">Nombre</label>
-          <input type="text" id="movieTitle" required />
-        </div>
-        <div class="formFields">
-          <label for="directorOfTheFilm">Director</label>
-          <input type="text" id="directorOfTheFilm" required />
-        </div>
-        <div class="formFields">
-          <label for="yearOfTheFilm">Año</label>
-          <input type="number" id="yearOfTheFilm" required />
-        </div>
-        <button type="submit">AGREGAR NUEVA PELÍCULA</button>
-      </form>
-      <p id="msgMovie" class="msg"></p>
-    </section>
-    <section>
-      <h2>Agregar nueva serie</h2>
-      <form id="formSeries">
-        <div class="formFields">
-          <label for="seriesName">Nombre</label>
-          <input type="text" id="seriesName" required />
-        </div>
-        <div class="formFields">
-          <label for="yearOfRelease">Año estreno</label>
-          <input type="number" id="yearOfRelease" required />
-        </div>
-        <div class="formFields">
-          <label for="seasons">N° temporadas</label>
-          <input type="number" id="seasons" required />
-        </div>
-        <button type="submit">AGREGAR NUEVA SERIE</button>
-      </form>
-      <p id="msgSeries" class="msg"></p>
-    </section>
+
+    <div id="results"></div>
 
     <script src="./js/client.js"></script>
+    <script src="./js/catalog.js"></script>
   </body>
 </html>
